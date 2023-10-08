@@ -1,44 +1,34 @@
-# Напишите функцию для транспонирования матрицы.
-# Пример: [[1, 2, 3], [4, 5, 6]] -> [[1,4], [2,5], [3, 6]]
-import random
+# Напишите функцию группового переименования файлов. Она должна:
+# - принимать параметр желаемое конечное имя файлов.
+# При переименовании в конце имени добавляется порядковый номер.
+# - принимать параметр количество цифр в порядковом номере.
+# - принимать параметр расширение исходного файла.
+# Переименование должно работать только для этих файлов внутри каталога.
+# - принимать параметр расширение конечного файла.
+# - принимать диапазон сохраняемого оригинального имени.
+# Например, для диапазона [3, 6] берутся буквы с 3 по 6 из исходного имени файла. К ним прибавляется желаемое
+# конечное имя, если оно передано. Далее счётчик файлов и расширение.
 
-class Matrix:
-    def __init__(self, rows: int, columns: int):
-        self.rows = rows
-        self.columns = columns
-        self.matrix = Matrix.create_matrix(rows, columns)
+from pathlib import Path
 
-    @staticmethod
-    def create_matrix(count_rows: int, count_columns: int) -> list[list]:
-        new_matrix = []
-        for _ in range(count_rows):
-            row = []
-            for _ in range(count_columns):
-                row.append(random.randint(0, 9))
-            new_matrix.append(row)
-        return new_matrix
-
-    def transposition(self):
-        # self.matrix.clear()
-        for column in range(self.columns):
-            new_row = []
-            for row in range(self.rows):
-                new_row.append(self.matrix[row][column])
-            self.matrix.append(new_row)
-        for _ in range(self.rows):
-            self.matrix.pop(0)
-
-    def __str__(self):
-        output = ''
-        for row in self.matrix:
-            for item in row:
-                output += f'{item:^3}'
-            output += '\n'
-        return output
+__all__ = ['rename_files']
 
 
-rows, columns = map(int, input('Введите количество строк и столбцов через пробел: ').split())
-matrix = Matrix(rows, columns)
-print(matrix)
-matrix.transposition()
-print(matrix)
+def rename_files(new_file: str, file_renamed: str, /, count_dig: int = 3, ext_new: str = None,
+                 saved_range: range = (3, 6), path: str = None) -> int:
+    if ext_new is None:
+        ext_new = file_renamed
+
+    work_path = Path.cwd() if path is None else Path(path)
+    count_renamed = 0
+    for p in work_path.iterdir():
+        if p.is_file() and p.suffix == file_renamed:
+            file_name = f"{p.stem[saved_range[0]:saved_range[1]]}{new_file}{count_renamed:03}{ext_new}"
+            p.rename(Path(p.parent, file_name))
+            count_renamed += 1
+
+    return count_renamed
+
+
+if __name__ == '__main__':
+    rename_files("new", ".txt")
