@@ -21,4 +21,4 @@ def par():
     parser.add_argument('-o', '--original_list', action='append')
     parser.add_argument('-u', '--unique_dublicate_list', action='append')
     args = parser.parse_args()
-    # return print(f'{args.original_list} {args.unique_dublicate_list}')
+    return print(f'{args.original_list} {args.unique_dublicate_list}')
